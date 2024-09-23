@@ -27,9 +27,9 @@ The dataset includes:
 - 1228200 associations from LLama3
 - 1228200 associations from Mistral
 - 1228200 associations from Claude Haiku
-- 3110 associations from ChatGPT 3.5
-- 3110 associations from ChatGPT 4
-- 3110  associations from ChatGPT 4o
+- 3110 associations from ChatGPT 3.5 focalized on gender bias.
+- 3110 associations from ChatGPT 4 focalized on gender bias.
+- 3110  associations from ChatGPT 4o focalized on gender bias.
   
 These associations were generated either via API or locally, depending on the LLM.
 
