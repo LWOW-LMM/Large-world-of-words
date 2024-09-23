@@ -1,4 +1,4 @@
-# Large-world-of-words
+# Large world of words
 _Katherine Elizabeth Abramski_, _Massimo Stella_, _Riccardo Improta_, _Giulio Rossetti_
 
 <p align="center">
