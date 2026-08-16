@@ -48,12 +48,12 @@ haiku <- read_graph("./data/graphs/igraphs/FA_Haiku_ig.graphml", format = "graph
 networkgraph = humans
 
 # Load LDT primes
-LDTList <- read.csv("./data/LDT_analyses/LDT_primes.csv", header = TRUE)
-LDT_primes <- as.character(primeList$prime)
+LDT_primeList <- read.csv("./data/LDT_analyses/LDT_primes.csv", header = TRUE)
+LDT_primes <- as.character(LDT_primeList$prime)
 
 # Load gender primes
-genderList <- read.csv("./data/LDT_analyses/gender_primes.csv", header = TRUE)
-gender_primes <- as.character(genderList$genderWord)
+gender_primeList <- read.csv("./data/LDT_analyses/gender_primes.csv", header = TRUE)
+gender_primes <- as.character(gender_primeList$genderWord)
 
 df <- spreadSimple(networkgraph, LDT_primes)
 write.csv(df, paste0("./data/LDT_analyses/FA_matrices/Humans_LDT.csv"), row.names = FALSE)
