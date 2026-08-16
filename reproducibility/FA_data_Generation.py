@@ -1,61 +1,99 @@
-import ollama
 import json
-import os
-from tqdm import tqdm
+import tqdm
+import re
+from autogen import AssistantAgent
+from FA_Functions import *
 
-# --- Config ---
-MODEL = "llama3.2"
-TEMPERATURE = 0.9
-N_TRIALS = 5
-SAVE_PATH = "results.jsonl"
-CUE_WORDS_PATH = "cue_words.txt"
+# update based on LLM
+config_list = [
+    {
+        "model": "mistral-7b-instruct-v0.1.Q4_K_M.gguf", 
+        "api_base": "http://10.8.0.1:8081/v1",
+        "api_type": "open_ai",
+        "api_key": "NULL",
+    }
+]
 
-# --- Load cue words from file ---
-with open(CUE_WORDS_PATH, "r") as f:
-    CUE_WORDS = [line.strip() for line in f if line.strip()]
+llm_config = {
+    "config_list": config_list,
+    "seed": 42,
+    "request_timeout": 1200,
+}
 
-# --- Load already completed cue/trial combinations if resuming ---
-completed = set()
-if os.path.exists(SAVE_PATH):
-    with open(SAVE_PATH, "r") as f:
-        for line in f:
-            record = json.loads(line)
-            completed.add((record["cue"], record["trial"]))
+# Load SWOW data
+simplifiedSWOW = loadSimplifiedSWOW()
+profiles_cues = getProfilesCues(simplifiedSWOW)
 
-# --- Prompt function ---
-def get_associations(cue, model, temperature):
-    prompt = f"Generate the first 3 words that come to mind in response to the word {cue.upper()}. Respond with exactly 3 words separated by commas and nothing else."
-    response = ollama.chat(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-        options={"temperature": temperature}
-    )
-    raw = response["message"]["content"].strip()
-    words = [w.strip().lower() for w in raw.split(",")]
-    return words[:3]
+words = [word for profiles_cues in profiles_cues for word in profiles_cues[1]]
 
-# --- Main loop ---
-with open(SAVE_PATH, "a") as f:
-    for cue in tqdm(CUE_WORDS):
-        for trial in range(1, N_TRIALS + 1):
-            if (cue, trial) in completed:
-                continue
-            try:
-                words = get_associations(cue, MODEL, TEMPERATURE)
-                cleaned = True
-            except Exception as e:
-                print(f"Error on {cue}, trial {trial}: {e}")
-                words = []
-                cleaned = False
+# update based on LLM
+with open('./data/original_datasets/mistral_free_associations.jsonl', "w") as f:
+    for word in tqdm.tqdm(words):
+        
 
-            record = {
-                "cue": cue,
-                "trial": trial,
-                "response": words,
-                "cleaned": cleaned
+        prompt = f""" 
+                Task:
+                 - You will be provided with an input word: write the first 3 words you associate to it separated by a comma.
+                 - No additional output text is allowed. 
+                
+                Constraints:
+                - no carriage return characters are allowed in the answers.
+                - answers should be as short as possible.
+                            
+                Example: 
+                Input: sea
+                Output: water,beach,sun
+                """
+
+        u2 = AssistantAgent(
+            name=f"Agent",
+            llm_config=llm_config,
+            system_message=prompt,
+            max_consecutive_auto_reply=1,
+        )
+
+        u1 = AssistantAgent(
+            name=f"Agent 1",
+            system_message="You are an agent that writes a single word at a time",
+            llm_config=llm_config,
+            max_consecutive_auto_reply=0,
+        )
+
+        results = []
+
+        u1.initiate_chat(
+            u2,
+            message=f"""{word}""",
+            silent=True,  # default is False
+            max_round=0,  # default is 3
+        )
+        cleaned = True
+        out = u1.chat_messages[u2][-1]["content"]
+
+        # output cleaning
+        try:
+            if len(out) > 0:
+                out = [u[1:].strip() if len(u) > 1 and u[0] == ' ' else u.strip() for u in out.split(",")]
+                r = []
+                for a in out:
+                    a = a.lower().split(" ")
+                    if len(a) <= 2:
+                        a = [re.sub(r'\W+', '', x) for x in a]
+                        a = [x for x in a if len(x) > 1]
+                        r.append(" ".join(a))
+                out = r
+
+            else:
+                out = []
+        except:
+            cleaned = False
+
+        res = {
+                "cue": word.lower(),
+                "response": out,
+                'cleaned': cleaned,
+                
             }
 
-            f.write(json.dumps(record) + "\n")
-            f.flush()
-
-print("Done.")
+        f.write(json.dumps(res) + "\n")
+        f.flush()
