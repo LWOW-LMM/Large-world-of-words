@@ -17,7 +17,3 @@ autogen==0.4.1
 
 # rpy2 is required only if running FA_spreadr.r from Python via reproducibility scripts
 rpy2==3.5.14
-
-# Used by the in-progress ollama-based data generation draft
-# (not yet installed in env1 as of 2026-08-15)
-ollama
