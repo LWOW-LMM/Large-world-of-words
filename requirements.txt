@@ -1,0 +1,23 @@
+# Core dependencies for the LWOW repo, based on the env1 conda environment
+# (C:\Users\keabr\anaconda3\envs\env1, Python 3.10.12)
+
+numpy==1.26.0
+pandas==1.5.3
+scipy==1.11.1
+scikit-learn==1.5.0
+networkx==3.1
+python-igraph==0.11.5
+matplotlib==3.8.0
+seaborn==0.13.2
+nltk==3.8.1
+tqdm==4.66.1
+
+# Free association generation (reproducibility/FA_data_Generation.py)
+autogen==0.4.1
+
+# rpy2 is required only if running FA_spreadr.r from Python via reproducibility scripts
+rpy2==3.5.14
+
+# Used by the in-progress ollama-based data generation draft
+# (not yet installed in env1 as of 2026-08-15)
+ollama

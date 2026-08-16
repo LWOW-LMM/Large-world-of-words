@@ -1,0 +1,25 @@
+# Licensed / restricted data — must not be pushed (see CLAUDE.md)
+reproducibility/data/original_datasets/SWOW-EN.R100.csv
+reproducibility/data/processed_datasets/FA_Humans.csv
+reproducibility/data/graphs/edge_lists/FA_Humans_edgelist.csv
+reproducibility/data/graphs/igraphs/FA_Humans_ig.graphml
+reproducibility/data/LDT_analyses/primingLDT_data.csv
+
+# Private working notes — not for the public repo
+CLAUDE.md
+docs/project-context.md
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Spyder project files
+.spyproject/
+
+# Editor/IDE
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
